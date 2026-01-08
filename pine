@@ -8,7 +8,7 @@ cli_help() {
   echo -e "
 \033[90m
   $cli_name
-  Pine Command Line Interface
+  Beamlynx Command Line Interface
   Version: $(cat $WORKDIR/VERSION)
   https://github.com/pine-lang/pine-cli
 `cat $WORKDIR/art/logo.txt`
@@ -16,12 +16,9 @@ cli_help() {
 Usage: $cli_name [command]
 
 Commands:
-  run server    Run the pine server and the web app
+  api           Run the pine-lang server
+  ui            Run beamlynx
   config        See the configuration i.e. database connections etc.
-
-Only for Dev:
-  run app       Run the pine server and the web app
-  run repl      Run the clojure repl for development. Connect to it using emacs \`cider-connect-clj\` [Not needed for pine-reborn]
   *             Help
 
 \033[0m
@@ -29,26 +26,15 @@ Only for Dev:
   exit 0
 }
 
-
 main () {
-    case "$2" in
-        app)
+    case "$1" in
+        ui)
             "$WORKDIR/commands/app" | tee -ia "$WORKDIR/logs/app.log"
             ;;
-        server)
+        api)
             "$WORKDIR/commands/server" $3 | tee -ia "$WORKDIR/logs/server.log"
             ;;
-        repl)
-            "$WORKDIR/commands/repl" | tee -ia "$WORKDIR/logs/repl.log"
-            ;;
-        *)
-            sub-main "$@"
-            ;;
-    esac
-}
 
-sub-main () {
-    case "$1" in
         config)
             "$WORKDIR/commands/config"
             ;;
