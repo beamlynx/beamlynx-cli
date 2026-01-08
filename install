@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -e
+export WORKDIR=$(cd "$(dirname "$(realpath "$0")")" && pwd)
+. "$WORKDIR/common"
+
+# Make sure we have the bin directory
+BIN_DIR=~/.local/bin
+mkdir -p $BIN_DIR
+
+BIN_FILE=$BIN_DIR/beam
+cli_log "Installing: $BIN_FILE"
+ln -sf $WORKDIR/beam $BIN_FILE
+
+cli_log "Setting up default configuration: $CONFIG_FILE"
+mkdir -p $CONFIG_DIR
+cp $WORKDIR/config.template $CONFIG_FILE

@@ -10,7 +10,7 @@ cli_help() {
   $cli_name
   Beamlynx Command Line Interface
   Version: $(cat $WORKDIR/VERSION)
-  https://github.com/pine-lang/pine-cli
+  https://github.com/beamlynx/beamlynx-cli
 `cat $WORKDIR/art/logo.txt`
 
 Usage: $cli_name [command]
@@ -18,7 +18,7 @@ Usage: $cli_name [command]
 Commands:
   api           Run the pine-lang server
   ui            Run beamlynx
-  config        See the configuration i.e. database connections etc.
+  config        Configure the beamlynx CLI
   *             Help
 
 \033[0m
@@ -26,20 +26,25 @@ Commands:
   exit 0
 }
 
+# cli_log "Reading configuration"
+[ ! -f "$CONFIG_DIR/config" ] \
+  && echo "ERROR: No $CONFIG_DIR/config file found. " \
+  && echo "Run install script." \
+  && exit 1
+
+export $(cat "$CONFIG_FILE" | xargs)
+
 main () {
     case "$1" in
         ui)
-            "$WORKDIR/commands/app" | tee -ia "$WORKDIR/logs/app.log"
+            "$WORKDIR/commands/ui" | tee -ia "$WORKDIR/logs/ui.log"
             ;;
         api)
-            "$WORKDIR/commands/server" $3 | tee -ia "$WORKDIR/logs/server.log"
+            "$WORKDIR/commands/api" $3 | tee -ia "$WORKDIR/logs/api.log"
             ;;
 
         config)
             "$WORKDIR/commands/config"
-            ;;
-        update)
-            "$WORKDIR/commands/update" "$1" | tee -ia "$WORKDIR/logs/update.log"
             ;;
         *)
             cli_help
@@ -47,4 +52,5 @@ main () {
     esac
 
 }
+
 main "$@"

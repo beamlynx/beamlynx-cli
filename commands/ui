@@ -3,6 +3,7 @@
 
 cd $WORKDIR
 
-cd pine-app
-./run.sh &
-cd -
+eval dir="$UI_PATH"
+cd "$dir"
+
+./run.sh

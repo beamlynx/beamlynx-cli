@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-CONFIG_DIR=~/.config/pine-lang
-TMP_DIR=/tmp/.pine-lang
+CONFIG_DIR=~/.config/beamlynx
+CONFIG_FILE=$CONFIG_DIR/config
+TMP_DIR=/tmp/beamlynx
 
 cli_log() {
   script_name=${0##*/}

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+. "$WORKDIR/common"
+
+echo
+echo
+echo 'Starting the server...'
+echo
+echo 'Once ready, go to https://try.pine-lang.org to start using it.'
+echo
+echo
+
+cli_log "Running in dev mode"
+
+eval dir="$API_PATH"
+cd "$dir"
+
+./server.sh

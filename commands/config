@@ -2,6 +2,9 @@
 set -e
 . "$WORKDIR/common"
 
-cd $CONFIG_DIR
+echo
+echo "Config file located at: ${CONFIG_FILE}"
+echo
+cat ${CONFIG_FILE}
+echo
 
-ls
