@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+. "$WORKDIR/common"
+
+# port -> description
+PORTS=(
+  "3142:beamlynx-ui dev server"
+  "9229:node inspector"
+  "33333:pine-lang dev server"
+)
+
+for entry in "${PORTS[@]}"; do
+  port="${entry%%:*}"
+  desc="${entry#*:}"
+  pids=$(lsof -ti tcp:"$port" 2>/dev/null || true)
+  if [ -n "$pids" ]; then
+    cli_log "Killing $desc on port $port (pid(s): $pids)"
+    kill -9 $pids
+  else
+    cli_log "No process found on port $port ($desc)"
+  fi
+done

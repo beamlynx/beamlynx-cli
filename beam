@@ -19,6 +19,7 @@ Commands:
   api           Run the pine-lang server
   ui            Run beamlynx (asks for desktop or browser mode)
   desktop       Run the beamlynx-desktop Electron app against a running 'ui' dev server
+  clean         Kill stray dev processes left on known ports (ui, api, inspector)
   config        Configure the beamlynx CLI
   *             Help
 
@@ -45,6 +46,10 @@ main () {
             ;;
         desktop)
             "$WORKDIR/commands/desktop"
+            ;;
+
+        clean)
+            "$WORKDIR/commands/clean"
             ;;
 
         config)
