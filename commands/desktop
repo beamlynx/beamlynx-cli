@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -e
+. "$WORKDIR/common"
+
+DEV_UI_PORT=3142
+
+[ -z "$DESKTOP_PATH" ] \
+  && echo "ERROR: DESKTOP_PATH is not set in $CONFIG_FILE." \
+  && echo "Add a line like: DESKTOP_PATH=~/code/beamlynx/beamlynx-desktop" \
+  && exit 1
+
+eval dir="$DESKTOP_PATH"
+cd "$dir"
+
+if [ ! -d "resources/server" ]; then
+  cli_log "resources/server not staged yet, running stage-server.sh"
+  ./scripts/stage-server.sh
+fi
+
+echo
+echo "Pointing Electron at http://localhost:$DEV_UI_PORT"
+echo "Make sure 'beam ui' is running in desktop mode in another terminal."
+echo
+
+BEAMLYNX_DEV_UI_URL="http://localhost:$DEV_UI_PORT" npm start

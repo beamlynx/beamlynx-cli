@@ -17,7 +17,8 @@ Usage: $cli_name [command]
 
 Commands:
   api           Run the pine-lang server
-  ui            Run beamlynx
+  ui            Run beamlynx (asks for desktop or browser mode)
+  desktop       Run the beamlynx-desktop Electron app against a running 'ui' dev server
   config        Configure the beamlynx CLI
   *             Help
 
@@ -41,6 +42,9 @@ main () {
             ;;
         api)
             "$WORKDIR/commands/api" $3 | tee -ia "$WORKDIR/logs/api.log"
+            ;;
+        desktop)
+            "$WORKDIR/commands/desktop"
             ;;
 
         config)
