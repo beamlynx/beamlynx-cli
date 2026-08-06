@@ -12,8 +12,50 @@ DEV_UI_PORT=3142
 eval dir="$DESKTOP_PATH"
 cd "$dir"
 
-if [ ! -d "resources/server" ]; then
-  cli_log "resources/server not staged yet, running stage-server.sh"
+PINE_LANG_DIR="$(cd ../pine-lang && pwd)"
+JAR="$PINE_LANG_DIR/target/pine-standalone.jar"
+APP_IMAGE="$PINE_LANG_DIR/desktop/build/app-image"
+STAGED="resources/server"
+
+# Rebuild whatever's stale in the pine-lang source -> jar -> app-image ->
+# staged pipeline before launching, so Electron never silently spawns a
+# server that's behind pine-lang's current source (this bit us once: the
+# staged jar sat a version behind for days because nothing re-ran the
+# staging scripts after a pine-lang release).
+rebuild_jar=false
+if [ ! -f "$JAR" ] || [ -n "$(find "$PINE_LANG_DIR/src" -newer "$JAR" -print -quit)" ]; then
+  rebuild_jar=true
+fi
+
+rebuild_app_image=false
+if $rebuild_jar || [ ! -d "$APP_IMAGE" ] || [ "$APP_IMAGE" -ot "$JAR" ]; then
+  rebuild_app_image=true
+fi
+
+restage=false
+if $rebuild_app_image || [ ! -d "$STAGED" ] || [ "$STAGED" -ot "$APP_IMAGE" ]; then
+  restage=true
+fi
+
+if $restage; then
+  if $rebuild_jar; then
+    cli_log "pine-lang source is newer than the built jar -- forcing a rebuild (build-app-image.sh reuses an existing jar otherwise)"
+    rm -f "$JAR"
+  fi
+
+  if $rebuild_app_image; then
+    JAVA_HOME="$(mise where java@temurin-21 2>/dev/null)"
+    if [ -z "$JAVA_HOME" ]; then
+      echo "ERROR: JDK 21 not found. Run: mise install java@temurin-21" >&2
+      echo "(pine-lang/desktop/JDK_VERSION pins 21 -- jlink/jpackage output is JDK-sensitive.)" >&2
+      exit 1
+    fi
+    export JAVA_HOME
+    cli_log "Building app-image with JDK 21 ($JAVA_HOME)"
+    (cd "$PINE_LANG_DIR/desktop" && ./build-app-image.sh)
+  fi
+
+  cli_log "Staging server into $STAGED"
   ./scripts/stage-server.sh
 fi
 
