@@ -7,16 +7,13 @@ echo "This always opens in a regular browser tab -- 'desktop' here only"
 echo "simulates the desktop app's runtime behavior (e.g. hidden version chip,"
 echo "desktop keybindings), it does not launch Electron. Use 'beam desktop'"
 echo "for that."
-read -p "Simulate desktop app behavior? [y/N] " mode
-case "$mode" in
-  y|Y)
-    echo "Simulating desktop app behavior (NEXT_PUBLIC_DESKTOP=1)"
-    export NEXT_PUBLIC_DESKTOP=1
-    ;;
-  *)
-    echo "Running as regular browser behavior"
-    ;;
-esac
+
+if [ "$1" = "--browser" ]; then
+  echo "Running as regular browser behavior"
+else
+  echo "Simulating desktop app behavior (NEXT_PUBLIC_DESKTOP=1). Use 'beam ui --browser' to opt out."
+  export NEXT_PUBLIC_DESKTOP=1
+fi
 
 eval dir="$UI_PATH"
 cd "$dir"
