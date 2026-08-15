@@ -34,3 +34,7 @@ One time setup:
 pine run dev-server
 pine run app
 ```
+
+## License
+
+[PolyForm Noncommercial License 1.0.0](LICENSE) - free for noncommercial use. For commercial licensing, contact contact@grephyte.com.
