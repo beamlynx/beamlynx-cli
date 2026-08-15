@@ -1,3 +1,4 @@
 API_PATH=~/code/beamlynx/pine-lang
 UI_PATH=~/code/beamlynx/beamlynx-ui
 DESKTOP_PATH=~/code/beamlynx/beamlynx-desktop
+WEBSITE_PATH=~/code/beamlynx/beamlynx.com

@@ -6,6 +6,7 @@ PORTS=(
   "3142:beamlynx-ui dev server"
   "9229:node inspector"
   "33333:pine-lang dev server"
+  "5173:beamlynx.com dev server"
 )
 
 for entry in "${PORTS[@]}"; do

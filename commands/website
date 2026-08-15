@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -e
+. "$WORKDIR/common"
+
+[ -z "$WEBSITE_PATH" ] \
+  && echo "ERROR: WEBSITE_PATH is not set in $CONFIG_FILE." \
+  && echo "Add a line like: WEBSITE_PATH=~/code/beamlynx/beamlynx.com" \
+  && exit 1
+
+eval dir="$WEBSITE_PATH"
+cd "$dir"
+
+cli_log "Starting the beamlynx.com website dev server"
+
+npm run dev
