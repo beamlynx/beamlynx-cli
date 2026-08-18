@@ -3,16 +3,13 @@
 
 cd $WORKDIR
 
-echo "This always opens in a regular browser tab -- 'desktop' here only"
-echo "simulates the desktop app's runtime behavior (e.g. hidden version chip,"
-echo "desktop keybindings), it does not launch Electron. Use 'beam desktop'"
-echo "for that."
-
-if [ "$1" = "--browser" ]; then
-  echo "Running as regular browser behavior"
-else
-  echo "Simulating desktop app behavior (NEXT_PUBLIC_DESKTOP=1). Use 'beam ui --browser' to opt out."
+if [ "$1" = "--desktop" ]; then
+  echo "Simulating desktop app behavior (NEXT_PUBLIC_DESKTOP=1): hidden version chip,"
+  echo "desktop keybindings. This does not launch Electron -- use 'beam desktop' for that."
   export NEXT_PUBLIC_DESKTOP=1
+else
+  echo "Running as regular browser behavior (beamlynx.com website mode)."
+  echo "Use 'beam ui --desktop' to simulate desktop app behavior instead."
 fi
 
 eval dir="$UI_PATH"
