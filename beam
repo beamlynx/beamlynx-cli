@@ -19,7 +19,7 @@ Commands:
   api           Run the pine-lang server
   ui            Run the beamlynx-ui dev server for the browser (pass --desktop to simulate desktop app behavior)
   website       Run the beamlynx.com marketing website locally
-  desktop       Run the beamlynx-ui dev server (desktop mode) and the beamlynx-desktop Electron app together
+  desktop, d    Run the beamlynx-ui dev server (desktop mode) and the beamlynx-desktop Electron app together
   kill          Kill stray dev processes left on known ports (ui, api, website, inspector)
   config        Configure the beamlynx CLI
   *             Help
@@ -48,7 +48,7 @@ main () {
         website)
             "$WORKDIR/commands/website" | tee -ia "$WORKDIR/logs/website.log"
             ;;
-        desktop)
+        desktop|d)
             "$WORKDIR/commands/desktop"
             ;;
 
