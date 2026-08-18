@@ -59,32 +59,9 @@ if $restage; then
   ./scripts/stage-server.sh
 fi
 
-cli_log "Starting the beamlynx-ui dev server in desktop mode"
-"$WORKDIR/commands/ui" --desktop >> "$WORKDIR/logs/ui.log" 2>&1 &
-UI_PID=$!
-
-cleanup() {
-  cli_log "Stopping the beamlynx-ui dev server"
-  pids=$(lsof -ti tcp:"$DEV_UI_PORT" 2>/dev/null || true)
-  [ -n "$pids" ] && kill -9 $pids 2>/dev/null
-  wait "$UI_PID" 2>/dev/null
-}
-trap cleanup EXIT
-
-cli_log "Waiting for the UI dev server on port $DEV_UI_PORT..."
-for i in $(seq 1 60); do
-  if lsof -ti tcp:"$DEV_UI_PORT" >/dev/null 2>&1; then
-    break
-  fi
-  if ! kill -0 "$UI_PID" 2>/dev/null; then
-    echo "ERROR: the beamlynx-ui dev server exited before it started listening. See $WORKDIR/logs/ui.log" >&2
-    exit 1
-  fi
-  sleep 1
-done
-
 echo
 echo "Pointing Electron at http://localhost:$DEV_UI_PORT"
+echo "Make sure 'beam ui' is running in desktop mode in another terminal."
 echo
 
 BEAMLYNX_DEV_UI_URL="http://localhost:$DEV_UI_PORT" npm start
