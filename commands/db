@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -e
+. "$WORKDIR/common"
+
+[ -z "$API_PATH" ] \
+  && echo "ERROR: API_PATH is not set in $CONFIG_FILE." \
+  && echo "Add a line like: API_PATH=~/code/beamlynx/pine-lang" \
+  && exit 1
+
+eval dir="$API_PATH"
+cd "$dir"
+
+COMPOSE_FILE="dev.docker-compose.yml"
+if [ ! -f "$COMPOSE_FILE" ]; then
+  echo "ERROR: $COMPOSE_FILE not found in $dir -- is API_PATH pointing at a pine-lang checkout that has it?"
+  exit 1
+fi
+
+case "$1" in
+  down)
+    cli_log "Stopping the local Postgres + MySQL test databases"
+    docker compose -f "$COMPOSE_FILE" down
+    ;;
+  logs)
+    docker compose -f "$COMPOSE_FILE" logs -f
+    ;;
+  *)
+    cli_log "Starting the local Postgres + MySQL test databases (same tables, same seed data -- see pine-lang/DEV.md)"
+    docker compose -f "$COMPOSE_FILE" up -d
+    echo
+    echo "Postgres: localhost:5435  (db pine, user pine, password pine)"
+    echo "MySQL:    localhost:3308  (db pine, user pine, password pine)"
+    echo
+    echo "Run 'beam api' (or 'clj -M:run-dev' in $dir) to point pine-lang at them."
+    echo "'beam db down' stops them, 'beam db logs' tails their logs."
+    ;;
+esac

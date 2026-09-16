@@ -20,6 +20,7 @@ Commands:
   ui            Run beamlynx (asks for desktop or browser mode)
   website       Run the beamlynx.com marketing website locally
   desktop       Run the beamlynx-desktop Electron app against a running 'ui' dev server
+  db            Run the local Postgres + MySQL test databases ('down'/'logs' subcommands too)
   kill          Kill stray dev processes left on known ports (ui, api, website, inspector)
   config        Configure the beamlynx CLI
   *             Help
@@ -50,6 +51,10 @@ main () {
             ;;
         desktop)
             "$WORKDIR/commands/desktop"
+            ;;
+
+        db)
+            "$WORKDIR/commands/db" "$2"
             ;;
 
         kill)
