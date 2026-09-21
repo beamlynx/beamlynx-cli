@@ -16,6 +16,7 @@ cli_help() {
 Usage: $cli_name [command]
 
 Commands:
+  dev           Run the ui and desktop together (kills stray dev processes first)
   api           Run the pine-lang server
   ui            Run beamlynx (asks for desktop or browser mode)
   website       Run the beamlynx.com marketing website locally
@@ -40,6 +41,9 @@ export $(cat "$CONFIG_FILE" | xargs)
 
 main () {
     case "$1" in
+        dev)
+            "$WORKDIR/commands/dev"
+            ;;
         ui)
             "$WORKDIR/commands/ui" | tee -ia "$WORKDIR/logs/ui.log"
             ;;

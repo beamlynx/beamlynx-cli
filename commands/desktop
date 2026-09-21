@@ -61,7 +61,9 @@ fi
 
 echo
 echo "Pointing Electron at http://localhost:$DEV_UI_PORT"
-echo "Make sure 'beam ui' is running in desktop mode in another terminal."
+# 'beam dev' starts that dev server itself and sets BEAM_DEV, so the
+# reminder only makes sense when 'beam desktop' is run on its own.
+[ -z "$BEAM_DEV" ] && echo "Make sure 'beam ui' is running in desktop mode in another terminal."
 echo
 
 BEAMLYNX_DEV_UI_URL="http://localhost:$DEV_UI_PORT" npm start

@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+set -e
+. "$WORKDIR/common"
+
+# The port 'beam desktop' points Electron at, and one of the ports
+# 'beam kill' clears -- keep all three in sync.
+DEV_UI_PORT=3142
+# The first Next.js compile is slow on a cold .next directory.
+UI_READY_TIMEOUT=180
+
+[ -z "$UI_PATH" ] \
+  && echo "ERROR: UI_PATH is not set in $CONFIG_FILE." \
+  && echo "Add a line like: UI_PATH=~/code/beamlynx/beamlynx-ui" \
+  && exit 1
+
+eval ui_dir="$UI_PATH"
+
+UI_LOG="$WORKDIR/logs/ui.log"
+mkdir -p "$WORKDIR/logs"
+
+ui_pid=""
+ui_pgid=""
+
+show_ui_log_tail() {
+  echo
+  echo "Last lines of $UI_LOG:"
+  tail -n 20 "$UI_LOG" 2>/dev/null || true
+  echo
+}
+
+# Runs when Electron quits, on Ctrl+C, and on any failure below -- the dev
+# server is ours to stop, since nothing else knows it was started here.
+cleanup() {
+  trap - EXIT INT TERM
+  if [ -n "$ui_pgid" ] && kill -0 "-$ui_pgid" 2>/dev/null; then
+    cli_log "Stopping the ui dev server"
+    kill -TERM "-$ui_pgid" 2>/dev/null || true
+  elif [ -n "$ui_pid" ] && kill -0 "$ui_pid" 2>/dev/null; then
+    cli_log "Stopping the ui dev server"
+    kill -TERM "$ui_pid" 2>/dev/null || true
+  fi
+  # `next dev` outlives its npm parent often enough to be worth the
+  # belt-and-braces pass: whatever still holds the port goes too.
+  stray=$(lsof -ti tcp:"$DEV_UI_PORT" 2>/dev/null || true)
+  if [ -n "$stray" ]; then
+    kill -9 $stray 2>/dev/null || true
+  fi
+}
+trap cleanup EXIT INT TERM
+
+# Leftovers from a previous run hold the two ports this needs: 3142 for the
+# dev server, and 33333, which Electron's bundled pine server refuses to
+# start on if anything else is already listening there.
+"$WORKDIR/commands/kill"
+
+echo
+cli_log "Starting the ui dev server in desktop mode (log: $UI_LOG)"
+: > "$UI_LOG"
+
+# Its own process group, so Ctrl+C reaches this script and Electron without
+# killing the dev server first -- cleanup above stops it deliberately, after
+# Electron is gone.
+if command -v setsid >/dev/null 2>&1; then
+  setsid bash -c "cd '$ui_dir' && NEXT_PUBLIC_DESKTOP=1 PORT=$DEV_UI_PORT npm run dev" >> "$UI_LOG" 2>&1 &
+else
+  bash -c "cd '$ui_dir' && NEXT_PUBLIC_DESKTOP=1 PORT=$DEV_UI_PORT npm run dev" >> "$UI_LOG" 2>&1 &
+fi
+ui_pid=$!
+ui_pgid=$(ps -o pgid= -p "$ui_pid" 2>/dev/null | tr -d ' ' || true)
+# Only useful if it really is a separate group -- killing our own group here
+# would take this script (and Electron) down with it.
+if [ "$ui_pgid" = "$(ps -o pgid= -p $$ 2>/dev/null | tr -d ' ')" ]; then
+  ui_pgid=""
+fi
+
+cli_log "Watch its output with: tail -f $UI_LOG"
+cli_log "Waiting for it to answer on http://localhost:$DEV_UI_PORT (the first compile takes a while)"
+waited=0
+until curl -sf -o /dev/null "http://127.0.0.1:$DEV_UI_PORT/"; do
+  if ! kill -0 "$ui_pid" 2>/dev/null; then
+    echo "ERROR: the ui dev server exited before it was ready." >&2
+    show_ui_log_tail
+    exit 1
+  fi
+  if [ "$waited" -ge "$UI_READY_TIMEOUT" ]; then
+    echo "ERROR: the ui dev server didn't answer within ${UI_READY_TIMEOUT}s." >&2
+    show_ui_log_tail
+    exit 1
+  fi
+  sleep 2
+  waited=$((waited + 2))
+  if [ $((waited % 20)) -eq 0 ]; then
+    cli_log "Still waiting (${waited}s)"
+  fi
+done
+cli_log "ui dev server is up"
+
+# Rebuilds the bundled server if pine-lang moved on, then launches Electron
+# in the foreground -- when it quits, cleanup stops the dev server.
+BEAM_DEV=1 "$WORKDIR/commands/desktop"
