@@ -1,3 +1,5 @@
+> **This CLI is no longer maintained, and this repo is archived.** Beamlynx is now one repo, [beamlynx/beamlynx-desktop](https://github.com/beamlynx/beamlynx-desktop). Get the app from [beamlynx.com](https://beamlynx.com).
+
 # Pine CLI
 
 Run the server:
