@@ -1,4 +1,8 @@
-> **This CLI is no longer maintained, and this repo is archived.** Beamlynx is now one repo, [beamlynx/beamlynx-desktop](https://github.com/beamlynx/beamlynx-desktop). Get the app from [beamlynx.com](https://beamlynx.com).
+> **This CLI has been replaced.** Its dev commands (`beam dev`, `beam ui`, `beam api`, `beam db`, `beam kill`) moved to [`bin/beam`](https://github.com/beamlynx/beamlynx-desktop/blob/main/bin/beam) in [beamlynx/beamlynx-desktop](https://github.com/beamlynx/beamlynx-desktop).
+>
+> **Why:** since November 2026, Pine, the Beamlynx interface and the desktop app are one repo. The CLI only existed to run those separate repos side by side, through a config file of paths. Inside one repo, `bin/beam` finds everything itself.
+>
+> This repo is archived and read-only. To use Beamlynx, get the app from [beamlynx.com](https://beamlynx.com).
 
 # Pine CLI
 
